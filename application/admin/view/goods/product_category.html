@@ -34,20 +34,12 @@
 		 title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
 
 	<span style="color:red;">*点击分类名称，可立即删除</span>
-	<!-- <table class="table">
-		<tr>
-			<td width="200" class="va-t">
-				<ul id="treeDemo" class="ztree">
-					
-				</ul>
-			</td>
-			<td class="va-t"><IFRAME ID="testIframe" Name="testIframe" FRAMEBORDER=0 SCROLLING=AUTO width=100% height=390px SRC="/admin/goods/product_category_add"></IFRAME></td>
-		</tr>
-	</table> -->
 	<table class="table">
 		<tr>
-			<td width="200" class="va-t"><ul id="treeDemo" class="ztree"></ul></td>
-			<td class="va-t"><IFRAME ID="testIframe" Name="testIframe" FRAMEBORDER=0 SCROLLING=AUTO width=100%  height=390px SRC="/admin/goods/product_category_add"></IFRAME></td>
+			<td width="200" class="va-t">
+				<ul id="treeDemo" class="ztree"></ul>
+			</td>
+			<td class="va-t"><IFRAME ID="testIframe" Name="testIframe" FRAMEBORDER=0 SCROLLING=AUTO width=100% height=390px SRC="/admin/goods/product_category_add"></IFRAME></td>
 		</tr>
 	</table>
 	<script type="text/javascript" src="/static/admin/lib/jquery/1.9.1/jquery.min.js"></script>
@@ -91,9 +83,8 @@
 					// console.log(treeNode);
 					$.ajax({
 						//
-						url: "product_category_del",
+						url: "/admin/product_category_del/id/" + treeNode.id,
 						type: 'get',
-						data: { id: treeNode.id },
 						dataType: 'json',
 						async: false,
 						success: function (data) {
@@ -119,11 +110,11 @@
 			code.append("<li>" + str + "</li>");
 		}
 
-		$(function(){
+		$(function () {
 			var t = $("#treeDemo");
 			// 初始化值
 			t = $.fn.zTree.init(t, setting, zNodes);
-			
+
 			demoIframe = $("#testIframe");
 			// 为这个元素添加一个事件
 			demoIframe.bind("load", loadReady);
