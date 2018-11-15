@@ -28,3 +28,21 @@ return [
     // 是否关闭日志写入
     'close'       => false,
 ];
+
+return [
+    'AUTH_CONFIG' => [
+            'AUTH_ON' => true,  // 认证开关
+            'AUTH_TYPE' => 1, // 认证方式，1为实时认证；2为登录认证。
+            'AUTH_GROUP' => 'shop_group', // 用户组数据表名
+            'AUTH_GROUP_ACCESS' => 'shop_group_access', // 用户-用户组关系表
+            'AUTH_RULE' => 'shop_rule', // 权限规则表
+        ],
+        
+        'url_route_on' => true,
+        'log'          => [
+            'type' => 'trace', // 支持 socket trace file
+        ], 
+       
+       
+    
+    ];

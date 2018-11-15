@@ -7,7 +7,7 @@ use app\admin\model\Rule;
 use think\Request;
 use app\admin\model\AdminUser;
 use app\admin\model\GroupAccess;
-class UserController extends Controller
+class UserController extends CommController
 {
    
     // 显示角色页面

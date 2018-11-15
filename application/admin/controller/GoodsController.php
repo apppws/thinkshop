@@ -13,7 +13,7 @@ use app\admin\model\GoodAttrKey;
 use app\admin\model\GoodAttrVal;
 use app\admin\model\Goodsku;
 
-class GoodsController extends Controller
+class GoodsController extends CommController
 {
 	// 显示页面
     public function product_category()
@@ -345,7 +345,7 @@ class GoodsController extends Controller
                 $sku->price = $item['price'];
                 $sku->stock = $item['stock'];
                 $sku->attr_symbol_path = $item['symbol'];
-                $sku->save();
+                 $sku->save();   
             }
 
         }
