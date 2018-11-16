@@ -28,7 +28,7 @@ return [
     // 是否关闭日志写入
     'close'       => false,
 ];
-
+// 权限认证 配置
 return [
     'AUTH_CONFIG' => [
             'AUTH_ON' => true,  // 认证开关
