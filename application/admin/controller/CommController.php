@@ -8,16 +8,16 @@ class CommController extends Controller
     // 当任何函数加载时候  会调用此函数
     public function initialize()
     {//默认的方法  会自动执行 特征有点像构造方法
-        $uid = session('user')['id'];
+        // $uid = session('user')['id'];
         // var_dump($uid);die;
-        if (empty($uid)) {
-            echo '<script>alert("没有登陆");location.href="' . '/admin/login/login' . '"</script>';
-        }
+        // if (empty($uid)) {
+        //     echo '<script>alert("没有登陆");location.href="' . '/admin/login/login' . '"</script>';
+        // }
         //最高管理权限
-        if($uid==1){
-            // 如果为1 不判断权限
-            return true;
-        }
+        // if($uid==1){
+        //     // 如果为1 不判断权限
+        //     return true;
+        // }
         /**
          * 权限判断
          */
