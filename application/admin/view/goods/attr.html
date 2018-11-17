@@ -89,7 +89,7 @@
  
             });
             $.ajax({
-                'url': '/admin/goods/save_sku',
+                'url': '/admin/goods/save_sku/id/{$goods_id}',
                 'method': 'post',
                 'data': obj,
                 'success': function (e) {
@@ -229,7 +229,7 @@
  
  
             $.ajax({
-                url:'/admin/goods/save_attr/',
+                url:'/admin/goods/save_attr/id/{$goods_id}',
                 method:'post',
                 dataType:'json',
                 data:{key:JSON.stringify(key),value:JSON.stringify(need)},

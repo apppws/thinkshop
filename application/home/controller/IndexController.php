@@ -79,6 +79,7 @@ class IndexController extends Controller
         return $this->fetch();
     }
 
+    // 商品详情页面
     public function details()
     {
         return $this->fetch();

@@ -12,7 +12,6 @@ use org\Upload;
 use app\admin\model\GoodAttrKey;
 use app\admin\model\GoodAttrVal;
 use app\admin\model\Goodsku;
-
 class GoodsController extends CommController
 {
 	// 显示页面
@@ -305,8 +304,12 @@ class GoodsController extends CommController
      * 商品属性管理
      */
     // 添加属性列表显示
-    public function attr()
+    public function attr(Request $req)
     {
+        $goods_id = $req->id;
+        // var_dump($goods_id);
+        // 把商品id传到 属性表中
+        $this->assign('goods_id',$goods_id);
         return $this->fetch();
     }
     // 修改属性
@@ -330,17 +333,17 @@ class GoodsController extends CommController
         return $this->view->fetch();
     }
     // 添加sku
-    public function save_sku()
+    public function save_sku(Request $req)
     {
         if (request()->isPost()) {
             $data = request()->post();
             // dump($data);
-            // $bool = Goodsku::where(['item_id' => $data[0]['item_id']])->delete();
+            $bool = Goodsku::where(['item_id' => $data[0]['item_id']])->delete();
             // console($bool);
             // 循环商品 添加库存量和 价格
             foreach ($data as $item) {
                 $sku = new Goodsku();
-                $sku->item_id = $item['item_id'];
+                $sku->item_id = $req->id;
                 $sku->original_price = $item['original_price'];
                 $sku->price = $item['price'];
                 $sku->stock = $item['stock'];
@@ -353,7 +356,7 @@ class GoodsController extends CommController
     }
 
     // 添加属性
-    public function save_attr()
+    public function save_attr(Request $req)
     {
         if (request()->isPost()) {
             // 接收所有参数
@@ -361,9 +364,9 @@ class GoodsController extends CommController
             // var_dump($data);
             $key = json_decode($data['key'], true);
             $value = json_decode($data['value'], true);    
-            $item_id = 1;
+            $item_id = $req->id;
             $key_id = [];
-            // GoodAttrKey::where(['item_id' => $item_id])->delete();
+            GoodAttrKey::where(['item_id' => $item_id])->delete();
             foreach ($key as $k) {
                 $attr_key = GoodAttrKey::where(['attr_name' => $k, 'item_id' => $item_id])->find();
                 // dump($attr_key);
@@ -377,7 +380,7 @@ class GoodsController extends CommController
             }
             $tm_v = [];
 
-            // GoodAttrVal::where(['item_id' => $item_id])->delete();
+            GoodAttrVal::where(['item_id' => $item_id])->delete();
             foreach ($value as $key => $v) {
                 $attr_key_id = $key_id[$key];
                 foreach ($v as $v1) {
