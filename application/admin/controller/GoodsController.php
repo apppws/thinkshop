@@ -316,7 +316,7 @@ class GoodsController extends CommController
     public function attr_exit()
     {
         $item_id = 1;
-        $data = GoodAttrKey::where(['item_id' => $item_id])->with(['itemattrval'])->select();
+        // $data = GoodAttrKey::where(['item_id' => $item_id])->with(['itemattrval'])->select();
         $need = [];
         foreach ($data as $item) {
             $need[] = $item->toArray();
@@ -338,7 +338,7 @@ class GoodsController extends CommController
         if (request()->isPost()) {
             $data = request()->post();
             // dump($data);
-            $bool = Goodsku::where(['item_id' => $data[0]['item_id']])->delete();
+            // $bool = Goodsku::where(['item_id' => $data[0]['item_id']])->delete();
             // console($bool);
             // 循环商品 添加库存量和 价格
             foreach ($data as $item) {
@@ -366,7 +366,7 @@ class GoodsController extends CommController
             $value = json_decode($data['value'], true);    
             $item_id = $req->id;
             $key_id = [];
-            GoodAttrKey::where(['item_id' => $item_id])->delete();
+            // GoodAttrKey::where(['item_id' => $item_id])->delete();
             foreach ($key as $k) {
                 $attr_key = GoodAttrKey::where(['attr_name' => $k, 'item_id' => $item_id])->find();
                 // dump($attr_key);
@@ -380,7 +380,7 @@ class GoodsController extends CommController
             }
             $tm_v = [];
 
-            GoodAttrVal::where(['item_id' => $item_id])->delete();
+            // GoodAttrVal::where(['item_id' => $item_id])->delete();
             foreach ($value as $key => $v) {
                 $attr_key_id = $key_id[$key];
                 foreach ($v as $v1) {

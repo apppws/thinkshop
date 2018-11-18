@@ -20,7 +20,7 @@
 	<meta name="description" content="百度MALL是国内最专业的 服装服饰、女装 网上购物商城，提供服装服饰、女装的最新报价、促销、评论、导购、图片等相关信息">
 
 	<link rel="shortcut icon" href="http://mallcdn.baidu.com/static/2016033051016/favicon.ico">
-	<script src="/static/index/js/core.js"></script>
+	<!-- <script src="/static/index/js/core.js"></script> -->
 
 	<script>
 		require.config({
@@ -1183,28 +1183,17 @@
 							<span class="text">正在加载，请稍后…</span>
 						</span>
 					</div>
-
 					<ul class="product-list">
 						{foreach $data as $data}
-
 						<li class="product-item product-item0" data-id="17170" data-skuid="94336" data-position-id="4000020">
 							<div class="product-wrapper">
-
 								<div class="img-container">
-
 									<img class="cover-img" src="{$data['image'][0]['filepath']}" data-title="{$data['goodsname']}">
-
 								</div>
-
-
 								<div class="small-img-list  no-padding ">
 									<div class="banner">
-
-
 										<div class="swiper-container">
-
 											<div class="swiper-wrapper">
-
 												<div class="swiper-slide">
 													{foreach $data['image'] as $image}
 													<a href="javascript:void(0)" target="_blank">
@@ -1213,33 +1202,23 @@
 													{/foreach}
 												</div>
 											</div>
-
-
 										</div>
-
 									</div>
 								</div>
 								<div class="context">
-
-
 									<h3 class="price">
-
-										<sub>￥</sub>{$data['curprice']}
+									<sub>￥</sub>{$data['curprice']}
 									</h3>
-									<a class="title" href="/product?itemId=17170&skuId=94336" alt="芭蒂娜2015欧洲站秋季新品 拼接长袖印花秋装a字连衣裙 修身显瘦" title="芭蒂娜2015欧洲站秋季新品 拼接长袖印花秋装a字连衣裙 修身显瘦"
+									<a class="title" href="javascript:void(0)" alt="{$data['goodsname']}" title="{$data['goodsname']}"
 									 data-position-id="4000020">{$data['goodsname']}</a>
 									<p class="shop-name" alt="badina服饰" title="badina服饰" data-id="297" data-position-id="4000021">
 										<a href="{$data['id']}" target="_blank" data-position-id="4000021">{$data['goodsname']}</a>
 									</p>
-								</div>
-
-								<i class="icon-favorite"></i>
-								<button class="btn-add">加入购物车</button>
-
+								</div>								
+								<!-- <i class="icon-favorite"></i> -->
+								<a href="/home/index/details/id/{$data['id']}" class="btn-add">查看商品</a>
 							</div>
-
 						</li>
-
 						{/foreach}
 
 					</ul>
