@@ -490,8 +490,10 @@
                                 <dt class="para-select" data-pid="41998"><span>{$v['attr_name']}</span></dt>
                                 <dd class="clearfix ">
                                     <div class="para-dd">
-                                        {foreach $v.vals as $v1}
-                                        <div id="item" class="des_item_acitve des_item_sm" data-pid="41998" data-vid="2059"><span>{$v1['attr_value']}</span>
+                                        {foreach $v.vals as $k1=>$v1}
+                                        <div class="item {if $k1==0}des_item_acitve{/if} des_item_sm" data-pid="41998" data-vid="2059">
+                                            <span>{$v1['attr_value']}</span>
+                                            <input type="hidden" value="{$v1['attr_value']}">
                                         </div>
                                         {/foreach}
                                     </div>
@@ -803,6 +805,8 @@
             });
         }
     </script>
+    <select name="val_id[]" id=""></select>
+    <select name="val_id[]" id=""></select>
     <script>
         window.alogObjectConfig = {
             product: '682',
@@ -830,12 +834,29 @@
 </html>
 <script>
     // 选中
-     // 获取这个 商品规格a标签
-     $("#item").click(function(){
-            // console.log($("#item"));
+    var arr = [];
+     $(".item").on('click',function(){
+            // console.log('aa');
             //获取这个所有父类a标签  并移除
             $(this).parent().find('div').removeClass('des_item_acitve');
             // 添加这个样式
             $(this).addClass('des_item_acitve');
+            // 调用 sku
+            $(this).find('input').each(function(k,v){
+                arr.push($(v).val());
+            });
+            // console.log($arr);
+            $.ajax({
+                type:"GET",
+                url:"/home/index/sku/id/{$goods['id']}",
+                data:{attr_val:arr},
+                dataType:'json',
+                success:function(data)
+                {
+                    console.log(data);
+                    
+                }
+            });
+
         });
 </script>

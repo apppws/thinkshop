@@ -144,4 +144,14 @@ class IndexController extends Controller
         return $this->fetch();
     }
 
+    public function sku(Request $req){
+        // var_dump($req->id);
+        // var_dump($req->attr_val);
+        $sku = DB::table('shop_sku')
+            ->where('item_id',$req->id)
+            ->select();
+        var_dump($sku);
+        // return json_encode($sku[0]);
+    }
+
 }

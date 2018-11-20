@@ -94,14 +94,23 @@
                                 <!-- product_edit_goods',array('id'=>$vo['id'],'tid'=>$vo['tid'] -->
                                 <a style="text-decoration:none" class="ml-5" href="/admin/goods/product_edit/id/{$vo['id']}/pid/{$vo['tid']}"
                                     title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
-                                <a style="text-decoration:none" class="ml-5" href="/admin/goods/attr/id/{$vo['id']}/pid/{$vo['tid']}"
-                                    title="添加属性"><i class="Hui-iconfont">&#xe634;</i></a>
+                                <a style="text-decoration:none" class="ml-5" href="#" id="attr" title="添加属性"><i class="Hui-iconfont">&#xe634;</i></a>
+                                <a style="text-decoration:none" class="ml-5" href="/admin/goods/sku/id/{$vo['id']}" title="添加sku"><i class="Hui-iconfont">&#xe636;</i></a>
                                 <a style="text-decoration:none" class="ml-5" href="/admin/goods/product_edit_delete/id/{$vo['id']}"
                                     title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a></td>
                         </tr>
                         {/foreach}
                     </tbody>
                 </table>
+
+                <!-- 隐藏 -->
+                <div class="control-group" style="width:500px;height: 200px;background-color: #cdcdcd;margin: -150px 250px;z-index: 8888;display: none;" >
+                    <label class="control-label"> </label>
+                    <div class="controls">
+                        <button id="add_lv1" class="btn btn-primary" type="button">添加规格项</button>
+                        <button id="update_table" class="btn btn-success" type="button">生成规格</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -112,6 +121,151 @@
     <script type="text/javascript" src="/static/admin/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
     <script type="text/javascript" src="/static/admin/static/h-ui/js/H-ui.js"></script>
     <script type="text/javascript" src="/static/admin/static/h-ui/js/H-ui.admin.js"></script>
+    <script>
+        $('#attr').click(function(){
+            $('.control-group').toggle();
+        })
+    </script>
+    <script>
+            let goods_id = 1;
+            // console.log(goods_id);
+            // 拼接添加规格html
+            var lv1HTML = '<div class="control-group lv1 item-attr " style="width:500px;height: 200px;margin: -150px 250px;">' +
+                            '<label class="control-label">规格名称</label>' +
+                            '<div class="controls">' +
+                                '<input type="text" name="lv1" placeholder="规格名称">' +
+                                '<button class="btn btn-primary add_lv2" type="button">添加参数</button>' +
+                                '<button class="btn btn-danger remove_lv1" type="button">删除规格</button>' +
+                            '</div>' +
+                            '<div class="controls lv2s"></div>' +
+                        '</div>';
+            // 添加参数
+            var lv2HTML = '<div style="margin-top: 5px;">' +
+                    '<input type="text" name="lv2" placeholder="参数名称">' +
+                    '<button class="btn btn-danger remove_lv2" type="button">删除参数</button>' +
+                    '</div>';
+         
+            $(document).ready(function() {
+                // 点击添加参数触发的 
+                $('#add_lv1').on('click', function() {
+                    var last = $('.control-group.lv1:last');
+                    if (!last || last.length == 0) {
+                        $(this).parents('.control-group').eq(0).after(lv1HTML);
+                    } else {
+                        last.after(lv1HTML);
+                    }
+                });
+                // 删除规格
+                $(document).on('click', '.remove_lv1', function() {
+                    $(this).parents('.lv1').remove();
+                });
+                // 追加参数
+                $(document).on('click', '.add_lv2', function() {
+                    $(this).parents('.lv1').find('.lv2s').append(lv2HTML);
+                });
+                // 删除参数
+                $(document).on('click', '.remove_lv2', function() {
+                    $(this).parent().remove();
+                });
+                $(document).on('click', '#save_product', function () {
+         
+                    var obj = {};
+                    var i = 0;
+                    var first = '';
+                    var tmp = {};
+                    $('#lv_table input').each(function (index, e) {
+                        // console.log(e);
+                        var name = $(e).attr('name');
+                        var value = $(e).val();
+                        symbol = name.split('|')[0];
+                        console.log(symbol);
+                        key = name.split('|')[1];
+                        if (index == 0) {
+                            first = symbol;
+                            tmp = {symbol: symbol, item_id: goods_id};
+        
+                        } else if (first != symbol) {
+                            first = symbol;
+                            i++;
+                            tmp = {symbol: symbol, item_id: goods_id};
+                        }
+                        tmp[key] = value;
+                        obj[i] = tmp;
+         
+                    });
+                    $.ajax({
+                        'url': '/admin/goods/save_sku/id/1',
+                        'method': 'post',
+                        'data': obj,
+                        'success': function (e) {
+         
+                        }
+                    });
+                    console.log(obj);
+                });
+         
+         
+                $(document).on('click', '#save_attr', function() {
+                    save_attr();
+                });
+                // 生成规格
+                $('#update_table').on('click', function() {
+                    save_attr();
+                });
+                function save_attr() {
+                    //生成key
+                    var key=[];
+                    $('.item-attr input[name=lv1]').each(function (index,ele) {
+                        key.push($(ele).val());
+                    });
+                    //生成值
+                    var need=[];
+                    for ( j=0;j<key.length;j++){
+                        need[j]=[];
+                    }
+                    i=0;
+                    $('.item-attr input').each(function (index,ele) {
+                        if($(ele).attr('name')=='lv1' && index!=0){
+                            i++;
+                        }else if(index!=0){
+                            need[i].push($(ele).val());
+                        }
+                    });
+         
+         
+                    $.ajax({
+                        url:'/admin/goods/save_attr/id/1',
+                        method:'post',
+                        dataType:'json',
+                        data:{key:JSON.stringify(key),value:JSON.stringify(need)},
+                        success:function (e) {
+                            // console.log(e);
+                            key = e.key;
+                            value = e.value;
+                            // console.log(key,value);
+                            // 调用这个方法
+                            create_attr_id(key,value);
+                            
+                        }
+                    });
+                }
+         
+                function create_attr_id(key,value) {
+                    // console.log(key,value);
+                    $('.item-attr input[name=lv1]').each(function (index,ele) {
+                      $(ele).attr('data-id',key[index]);
+                    });
+                    $('.item-attr input[name=lv2]').each(function (index,ele) {
+                       $(ele).attr('data-id',value[index]);
+                    });
+                    update_table();
+                    console.log($('#save_product'));
+                    $('#save_product').show();
+                }
+         
+         
+            });
+        </script>
     <script type="text/javascript">
         var zNodes;
         $.ajax({
@@ -217,6 +371,32 @@
                 $(obj).parents("tr").find(".td-status").html('<span class="label label-defaunt radius">已下架</span>');
                 $(obj).remove();
                 layer.msg('已下架!', { icon: 5, time: 1000 });
+            });
+        }
+
+        // 添加属性
+        function product_attr() {
+            layer.open({
+                type: 2,
+                title: false,
+                closeBtn: 0, //不显示关闭按钮
+                shade: [0],
+                area: ['340px', '215px'],
+                offset: 'rb', //右下角弹出
+                time: 2000, //2秒后自动关闭
+                anim: 2,
+                content: ['test/guodu.html', 'no'], //iframe的url，no代表不显示滚动条
+                end: function () { //此处用于演示
+                    layer.open({
+                        type: 2,
+                        title: '很多时候，我们想最大化看，比如像这个页面。',
+                        shadeClose: true,
+                        shade: false,
+                        maxmin: true, //开启最大化最小化按钮
+                        area: ['893px', '600px'],
+                        content: '//fly.layui.com/'
+                    });
+                }
             });
         }
 

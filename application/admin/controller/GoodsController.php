@@ -12,6 +12,7 @@ use org\Upload;
 use app\admin\model\GoodAttrKey;
 use app\admin\model\GoodAttrVal;
 use app\admin\model\Goodsku;
+use app\admin\model\SkuAttr;
 class GoodsController extends CommController
 {
 	// 显示页面
@@ -309,7 +310,7 @@ class GoodsController extends CommController
         $goods_id = $req->id;
         // var_dump($goods_id);
         // 把商品id传到 属性表中
-        $this->assign('goods_id',$goods_id);
+        $this->assign('goods_id', $goods_id);
         return $this->fetch();
     }
     // 修改属性
@@ -332,25 +333,52 @@ class GoodsController extends CommController
         $this->view->assign('Goodsku', json_encode($skus, 320));
         return $this->view->fetch();
     }
-    // 添加sku
-    public function save_sku(Request $req)
+    public function sku(Request $req)
     {
-        if (request()->isPost()) {
-            $data = request()->post();
-            // dump($data);
-            // $bool = Goodsku::where(['item_id' => $data[0]['item_id']])->delete();
-            // console($bool);
-            // 循环商品 添加库存量和 价格
-            foreach ($data as $item) {
-                $sku = new Goodsku();
-                $sku->item_id = $req->id;
-                $sku->original_price = $item['original_price'];
-                $sku->price = $item['price'];
-                $sku->stock = $item['stock'];
-                $sku->attr_symbol_path = $item['symbol'];
-                 $sku->save();   
-            }
-
+        // 取出所有属性值 
+        $key = GoodAttrKey::where(['goods_id' => $req->id])->select();
+        // var_dump($key);
+        // 取出所有属性名
+        $val = GoodAttrVal::where(['goods_id' => $req->id])->select();
+        // var_dump($val);
+        $this->assign('key', $key);
+        $this->assign('val', $val);
+        $this->assign('goods_id',$req->id);
+        return $this->fetch();
+    }
+    // 添加sku
+    public function sku_add(Request $req)
+    {
+        // 接收参数
+        $data['goods_id'] = $req->goods_id;
+        $data['price'] = $req->price;
+        $data['original_price'] = $req->original_price;
+        $data['stock'] = $req->stock;
+        $data['freight'] = $req->freight;
+        // var_dump($data);
+        $skuid = Goodsku::insertGetId($data);
+        // 定义一个空数组
+        $attrs=[];
+        // var_dump($req->attr_key_id);
+        // 得到点击的id key
+        $keyid = $req->attr_key_id;
+        // 并循环  
+        foreach($keyid as $k=>$v){
+            $attrs[] =[
+                'attr_key_id'=>$v,
+                // attr_val_id  下标都是一样的   根据k 
+                'attr_val_id'=>$req->attr_val_id[$k],
+                'sku_id'=>$skuid,
+            ];
+        }
+        
+        $skuAttr = new SkuAttr;
+        $res = $skuAttr->saveAll($attrs);
+        
+        if ($res) {
+            return $this->success("添加成功", "product_list", "", 2);
+        } else {
+            return $this->error("添加失败", "product_list", "", 2);
         }
 
     }
@@ -358,39 +386,40 @@ class GoodsController extends CommController
     // 添加属性
     public function save_attr(Request $req)
     {
+
         if (request()->isPost()) {
             // 接收所有参数
             $data = request()->post();
             // var_dump($data);
             $key = json_decode($data['key'], true);
-            $value = json_decode($data['value'], true);    
-            $item_id = $req->id;
+            $value = json_decode($data['value'], true);
+            $goods_id = $req->id;
             $key_id = [];
-            // GoodAttrKey::where(['item_id' => $item_id])->delete();
+            // GoodAttrKey::where(['goods_id' => $goods_id])->delete();
             foreach ($key as $k) {
-                $attr_key = GoodAttrKey::where(['attr_name' => $k, 'item_id' => $item_id])->find();
+                $attr_key = GoodAttrKey::where(['key_name' => $k, 'goods_id' => $goods_id])->find();
                 // dump($attr_key);
                 if (!$attr_key) {
                     $attr_key = new GoodAttrKey();
-                    $attr_key->attr_name = $k;
-                    $attr_key->item_id = $item_id;
+                    $attr_key->key_name = $k;
+                    $attr_key->goods_id = $goods_id;
                     $attr_key->save();
                 }
                 $key_id[] = $attr_key->attr_key_id;
             }
             $tm_v = [];
 
-            // GoodAttrVal::where(['item_id' => $item_id])->delete();
+            // GoodAttrVal::where(['goods_id' => $goods_id])->delete();
             foreach ($value as $key => $v) {
                 $attr_key_id = $key_id[$key];
                 foreach ($v as $v1) {
-                    $attr_value = GoodAttrVal::where(['attr_value' => $v1, 'attr_key_id' => $attr_key_id])->find();
+                    $attr_value = GoodAttrVal::where(['val_name' => $v1, 'id' => $attr_key_id])->find();
                     // dump($attr_value);
                     if (!$attr_value) {
                         $attr_value = new GoodAttrVal();
                         $attr_value->attr_key_id = $attr_key_id;
-                        $attr_value->attr_value = $v1;
-                        $attr_value->item_id = $item_id;
+                        $attr_value->val_name = $v1;
+                        $attr_value->goods_id = $goods_id;
                         $attr_value->save();
                     }
                     $tm_v[] = $attr_value->symbol;
