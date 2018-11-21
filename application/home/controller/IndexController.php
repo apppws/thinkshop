@@ -125,7 +125,7 @@ class IndexController extends Controller
         // echo '<pre>';
         // var_dump($goods);
         // 取出sku
-        $sku = DB::table('shop_sku')->where('item_id',$goods_id)->select();
+        $sku = DB::table('shop_sku')->where('goods_id',$goods_id)->select();
         // 根据sku_id 取出 val 和 key
         // var_dump($sku[0]['attr_symbol_path']);
         /*
@@ -134,7 +134,7 @@ class IndexController extends Controller
         LEFT JOIN shop_attr_key c ON a.attr_key_id = c.attr_key_id
         where a.item_id = b.item_id" 
          */
-        $keys = GoodAttrKey::where('item_id',$goods_id)->select();
+        $keys = GoodAttrKey::where('goods_id',$goods_id)->select();
         
         // var_dump($keys);
         $this->assign('type', $type);
@@ -145,13 +145,20 @@ class IndexController extends Controller
     }
 
     public function sku(Request $req){
-        // var_dump($req->id);
-        // var_dump($req->attr_val);
-        $sku = DB::table('shop_sku')
-            ->where('item_id',$req->id)
-            ->select();
-        var_dump($sku);
-        // return json_encode($sku[0]);
+        header('Content-Type:text/html; charset=utf-8');
+        $attr = $req->attr_id;
+        // var_dump($attr);
+        $keyid = implode(',',$attr);
+        $sku = DB::query(
+                "SELECT * from shop_sku WHERE id = 
+                    (SELECT sku_id
+                        FROM sku_attr a 
+                        where attr_val_id in ($keyid)
+                        GROUP BY sku_id
+                        having count(*) = 2)"
+                );
+        // var_dump($sku);
+        return json_encode($sku[0]);
     }
 
 }

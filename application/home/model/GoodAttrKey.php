@@ -5,7 +5,7 @@ use app\home\model\GoodAttrVal;
 class GoodAttrKey extends \think\Model
 
 {
-    protected $pk = 'attr_key_id';
+    protected $pk = 'id';
     // 设置当前模型对应的完整数据表名称
     protected $table = 'shop_attr_key';
     public function vals(){
