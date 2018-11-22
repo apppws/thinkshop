@@ -13,6 +13,8 @@ use Db;
 use think\Request;
 use think\Cookie;
 use Yansongda\Pay\Pay;
+use Yansongda\Pay\Log;
+
 
 class IndexController extends Controller
 {
@@ -396,7 +398,7 @@ class IndexController extends Controller
         // dd($req->get('pay_method') );
         // 跳转去支付
         if ($paymethods == '支付宝') {
-            return redirect('/home/index/pay/orID/' . $orID . '/countPirce/' . $countPirce);
+            return redirect('/home/index/pay/orID/'.$orID.'/countPirce/'.$countPirce);
         } elseif ($paymethods == '微信') {
             return redirect('/payByWechat/' . $orID . '/' . $countPirce);
         }
@@ -412,52 +414,49 @@ class IndexController extends Controller
 
         return date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
     }
+    
+    public $config =  [
+        'app_id' =>'2016091600527335',
+        'ali_public_key' => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqezjjFgYiMrbCWugQqthGzZSk/8JsIJZlLEm6TAfg2CLFQ4Ks3czKaJ7O1Oe6X4X7vVA18KbOKVfI+a0MypWNRcHpqVhbO4jrdawhXQJAgTDgkRZh2UAPZw4aELz1fQxCIto7itY0vQfU94P5tljLX755eFPIbzWfkVHD1pKLlg/Ylrbv0gHXRRuSPDGDznO/hmhsyO+2XqZokqqLDT0lPVDkdHWEGgF+tWRZAza9CEif4/Hs2Gj2z8DO1FF6ieEikC0ywuQDCvSAxUy7cl5AnpzbqzFsSIZgU0+ag+VtfYbV2KQIgJawHziOT9WLJYhSNeHRQBa6jL7e/3VZyyATQIDAQAB',
+        'private_key' => 'MIIEpAIBAAKCAQEAxG42Ea9YCkCMyRCB/ZJE9eE4VjI0iAmPB9JV6h1Za5drR9nrBrkYW/9mQd8LxeUzFyVCapWDUe88x6UUYSPaatcsmr6IW8xzrgcWJWszfRaGr3MzMLsQHnV02zyviqNkIlgsgoRApkLWEPwNRlwXGxyg4HtdQIjHeNL4VvOBBNKitI0cO9GNlGXwO8EkA82HZh2TIP6d9emxIzBHs6wJ6CbgmJ2dkAVGeBl7PXtS4/kcg+6fYm/0Xtbq8LL9jOhvR67QhGkXDRU0WU5gAx3Y+xoLs0eR1XXwtHWl45L1vxWGrNI1m+p5ng6Q2d0SRiKrMBNRM6VlqWFICW8HGROUBwIDAQABAoIBAQCrEJgB2sQ/WWvCBqBOJj3sK9GWL27UMg7f7utnUVv4eQuyrTMizbtLEycIoqhsFWji9U3b6I1Oo5w4+ai/2Ct09CMiOGAkIe90VTOSLsPOYfm1fgvMmnw1KnE0JKtzf0vLJSLOH0L2CCrI69jbt4Nf1xS7qnPRqcydio0/nBx2BzuLarZmnePKJ0P4UmsYgQG8J/JLOuULyLNXmwaIodaunj563/bkdHNiBBg2tC/nTb44AR8iY/RAxJW+hnmMnpWvNGpbumI1RaZPepzyrTmHGreB0x656V7b/doub3KSCtPZjwusxVPftS6muzG4tUQ0YM2ftL97iJQvQfrfb4WhAoGBAOQcTO/HYqN68X1iBkykYcJVswOiZhHAVnCnoMjqgt7nJVtnPbvvAl1Igv8BXEND8oSZ7xCV2LXy1xbozWQkLQ/RRLWt8mNZqFbnKFtJ+eUp7dpuyOqW12dmQM2njmmnM4FVZN3MYeobKHDYJlDo07XASmQ0oHbct5NO4DHJ+ELfAoGBANxyWQzvNNqCCnLxKzijm45kCydo712vAVYsNkn1TfONpWl8adJyzkDBwGekrKBs25uA5jOBZICGR7DsT4a3zxt5RpUXX4WMMASUmetdrFyTpAffsib5r+jLLPMXfYOb9C/u5S2z2FN98Tqx+2XfI3bTAag7jXjgfPX5Y4WGdrvZAoGAFekd/r4hHGDXx1peDoiPl1ISAtxbf4MBCosfZ40XCwAa13/AL0gS6xDm/EWOLivdpJ0AmJA8I6XywRGVgPP0nBtWxTizGpXnFInZl4MwjLGNVjjj9ZyNjjIFMXvRsxZLXTXtnVxfX1RCeyxX6dejVkblHmDrtN8Yhv7BjCbBQPMCgYEAvVGqrpQERR/nD12U69h+MGQ0vAy/fSpdsH7ZxNxZrK/Z/eSuEOEtxqleruPaqQ+z7jFeAZ+/Cy3HBed8SMs0n3igqEvhahTB7D0ejubsrrjQ5z4yhoxqiTdsC/0BevSFWmEFCyHnx5RihjDyIUPn9hUy2CME1Wmdh7U8xiB7eckCgYBmyckGg4B8qnnn9fV66wIsaqypb2tPHnXFBbOEfC4u3xHNLU8QCUZc6qoK3wyuVVWs+75yztpZzFE/TYrL9CXi4MjrY38nHFLwvsIXOFTxEnvXbog2T8ECT2Gj1xlOX6Z0vjTV9rLCmw9uq0nYiQ/dSJ4GjaUqtdYPKtdnpz62Qw==',
+        'notify_url' => 'http://yansongda.cn/alipayNotify',
+        'return_url' => 'http://127.0.0.1:8000/home/index/return',
+        // 沙箱模式（可选）
+        'mode' => 'dev',
+    ];
+
 
     // 显示支付页面(支付宝)   // jwelpt9815@sandbox.com
     public function pay(Request $req)
     {
-        $config = [
-            'app_id' => '2016091600527335',
-            'ali_public_key' => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqezjjFgYiMrbCWugQqthGzZSk/8JsIJZlLEm6TAfg2CLFQ4Ks3czKaJ7O1Oe6X4X7vVA18KbOKVfI+a0MypWNRcHpqVhbO4jrdawhXQJAgTDgkRZh2UAPZw4aELz1fQxCIto7itY0vQfU94P5tljLX755eFPIbzWfkVHD1pKLlg/Ylrbv0gHXRRuSPDGDznO/hmhsyO+2XqZokqqLDT0lPVDkdHWEGgF+tWRZAza9CEif4/Hs2Gj2z8DO1FF6ieEikC0ywuQDCvSAxUy7cl5AnpzbqzFsSIZgU0+ag+VtfYbV2KQIgJawHziOT9WLJYhSNeHRQBa6jL7e/3VZyyATQIDAQAB',
-            'private_key' => 'MIIEpAIBAAKCAQEAxG42Ea9YCkCMyRCB/ZJE9eE4VjI0iAmPB9JV6h1Za5drR9nrBrkYW/9mQd8LxeUzFyVCapWDUe88x6UUYSPaatcsmr6IW8xzrgcWJWszfRaGr3MzMLsQHnV02zyviqNkIlgsgoRApkLWEPwNRlwXGxyg4HtdQIjHeNL4VvOBBNKitI0cO9GNlGXwO8EkA82HZh2TIP6d9emxIzBHs6wJ6CbgmJ2dkAVGeBl7PXtS4/kcg+6fYm/0Xtbq8LL9jOhvR67QhGkXDRU0WU5gAx3Y+xoLs0eR1XXwtHWl45L1vxWGrNI1m+p5ng6Q2d0SRiKrMBNRM6VlqWFICW8HGROUBwIDAQABAoIBAQCrEJgB2sQ/WWvCBqBOJj3sK9GWL27UMg7f7utnUVv4eQuyrTMizbtLEycIoqhsFWji9U3b6I1Oo5w4+ai/2Ct09CMiOGAkIe90VTOSLsPOYfm1fgvMmnw1KnE0JKtzf0vLJSLOH0L2CCrI69jbt4Nf1xS7qnPRqcydio0/nBx2BzuLarZmnePKJ0P4UmsYgQG8J/JLOuULyLNXmwaIodaunj563/bkdHNiBBg2tC/nTb44AR8iY/RAxJW+hnmMnpWvNGpbumI1RaZPepzyrTmHGreB0x656V7b/doub3KSCtPZjwusxVPftS6muzG4tUQ0YM2ftL97iJQvQfrfb4WhAoGBAOQcTO/HYqN68X1iBkykYcJVswOiZhHAVnCnoMjqgt7nJVtnPbvvAl1Igv8BXEND8oSZ7xCV2LXy1xbozWQkLQ/RRLWt8mNZqFbnKFtJ+eUp7dpuyOqW12dmQM2njmmnM4FVZN3MYeobKHDYJlDo07XASmQ0oHbct5NO4DHJ+ELfAoGBANxyWQzvNNqCCnLxKzijm45kCydo712vAVYsNkn1TfONpWl8adJyzkDBwGekrKBs25uA5jOBZICGR7DsT4a3zxt5RpUXX4WMMASUmetdrFyTpAffsib5r+jLLPMXfYOb9C/u5S2z2FN98Tqx+2XfI3bTAag7jXjgfPX5Y4WGdrvZAoGAFekd/r4hHGDXx1peDoiPl1ISAtxbf4MBCosfZ40XCwAa13/AL0gS6xDm/EWOLivdpJ0AmJA8I6XywRGVgPP0nBtWxTizGpXnFInZl4MwjLGNVjjj9ZyNjjIFMXvRsxZLXTXtnVxfX1RCeyxX6dejVkblHmDrtN8Yhv7BjCbBQPMCgYEAvVGqrpQERR/nD12U69h+MGQ0vAy/fSpdsH7ZxNxZrK/Z/eSuEOEtxqleruPaqQ+z7jFeAZ+/Cy3HBed8SMs0n3igqEvhahTB7D0ejubsrrjQ5z4yhoxqiTdsC/0BevSFWmEFCyHnx5RihjDyIUPn9hUy2CME1Wmdh7U8xiB7eckCgYBmyckGg4B8qnnn9fV66wIsaqypb2tPHnXFBbOEfC4u3xHNLU8QCUZc6qoK3wyuVVWs+75yztpZzFE/TYrL9CXi4MjrY38nHFLwvsIXOFTxEnvXbog2T8ECT2Gj1xlOX6Z0vjTV9rLCmw9uq0nYiQ/dSJ4GjaUqtdYPKtdnpz62Qw==',
-            'level' => ['error', 'alert'],
-        ];
-
-        $orID = $req->orID;
-        $countprice = $req->countprice;
-        $order = new Order;
+        // var_dump($orID);
+        // var_dump($countprice);
+       
         // 调用支付宝的网页支付
-        return Pay::alipay($config)->web([
-            'out_trade_no' => $orID, // 订单编号，需保证在商户端不重复
-            'total_amount' => $countprice, // 订单金额，单位元，支持小数点后两位
-            'subject' => '支付 pws 商城 的订单：' . $orID, // 订单标题
-        ]);
+        $order = [
+            'out_trade_no' =>$req->orID, // 订单编号，需保证在商户端不重复
+            'total_amount' =>$req->countPirce, // 订单金额，单位元，支持小数点后两位
+            'subject' => '支付 pws 商城 的订单：'.$req->orID, // 订单标题
+        ]; 
+        $alipay = Pay::alipay($this->config)->web($order);
+
+        return $alipay->send();// laravel 框架中请直接 `return $alipay
     }
 
     // 前端回调页面
-    public function alipayReturn()
+    public function return()
     {
-        $config = [
-            'app_id' => '2016091600527335',
-            'ali_public_key' => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqezjjFgYiMrbCWugQqthGzZSk/8JsIJZlLEm6TAfg2CLFQ4Ks3czKaJ7O1Oe6X4X7vVA18KbOKVfI+a0MypWNRcHpqVhbO4jrdawhXQJAgTDgkRZh2UAPZw4aELz1fQxCIto7itY0vQfU94P5tljLX755eFPIbzWfkVHD1pKLlg/Ylrbv0gHXRRuSPDGDznO/hmhsyO+2XqZokqqLDT0lPVDkdHWEGgF+tWRZAza9CEif4/Hs2Gj2z8DO1FF6ieEikC0ywuQDCvSAxUy7cl5AnpzbqzFsSIZgU0+ag+VtfYbV2KQIgJawHziOT9WLJYhSNeHRQBa6jL7e/3VZyyATQIDAQAB',
-            'private_key' => 'MIIEpAIBAAKCAQEAxG42Ea9YCkCMyRCB/ZJE9eE4VjI0iAmPB9JV6h1Za5drR9nrBrkYW/9mQd8LxeUzFyVCapWDUe88x6UUYSPaatcsmr6IW8xzrgcWJWszfRaGr3MzMLsQHnV02zyviqNkIlgsgoRApkLWEPwNRlwXGxyg4HtdQIjHeNL4VvOBBNKitI0cO9GNlGXwO8EkA82HZh2TIP6d9emxIzBHs6wJ6CbgmJ2dkAVGeBl7PXtS4/kcg+6fYm/0Xtbq8LL9jOhvR67QhGkXDRU0WU5gAx3Y+xoLs0eR1XXwtHWl45L1vxWGrNI1m+p5ng6Q2d0SRiKrMBNRM6VlqWFICW8HGROUBwIDAQABAoIBAQCrEJgB2sQ/WWvCBqBOJj3sK9GWL27UMg7f7utnUVv4eQuyrTMizbtLEycIoqhsFWji9U3b6I1Oo5w4+ai/2Ct09CMiOGAkIe90VTOSLsPOYfm1fgvMmnw1KnE0JKtzf0vLJSLOH0L2CCrI69jbt4Nf1xS7qnPRqcydio0/nBx2BzuLarZmnePKJ0P4UmsYgQG8J/JLOuULyLNXmwaIodaunj563/bkdHNiBBg2tC/nTb44AR8iY/RAxJW+hnmMnpWvNGpbumI1RaZPepzyrTmHGreB0x656V7b/doub3KSCtPZjwusxVPftS6muzG4tUQ0YM2ftL97iJQvQfrfb4WhAoGBAOQcTO/HYqN68X1iBkykYcJVswOiZhHAVnCnoMjqgt7nJVtnPbvvAl1Igv8BXEND8oSZ7xCV2LXy1xbozWQkLQ/RRLWt8mNZqFbnKFtJ+eUp7dpuyOqW12dmQM2njmmnM4FVZN3MYeobKHDYJlDo07XASmQ0oHbct5NO4DHJ+ELfAoGBANxyWQzvNNqCCnLxKzijm45kCydo712vAVYsNkn1TfONpWl8adJyzkDBwGekrKBs25uA5jOBZICGR7DsT4a3zxt5RpUXX4WMMASUmetdrFyTpAffsib5r+jLLPMXfYOb9C/u5S2z2FN98Tqx+2XfI3bTAag7jXjgfPX5Y4WGdrvZAoGAFekd/r4hHGDXx1peDoiPl1ISAtxbf4MBCosfZ40XCwAa13/AL0gS6xDm/EWOLivdpJ0AmJA8I6XywRGVgPP0nBtWxTizGpXnFInZl4MwjLGNVjjj9ZyNjjIFMXvRsxZLXTXtnVxfX1RCeyxX6dejVkblHmDrtN8Yhv7BjCbBQPMCgYEAvVGqrpQERR/nD12U69h+MGQ0vAy/fSpdsH7ZxNxZrK/Z/eSuEOEtxqleruPaqQ+z7jFeAZ+/Cy3HBed8SMs0n3igqEvhahTB7D0ejubsrrjQ5z4yhoxqiTdsC/0BevSFWmEFCyHnx5RihjDyIUPn9hUy2CME1Wmdh7U8xiB7eckCgYBmyckGg4B8qnnn9fV66wIsaqypb2tPHnXFBbOEfC4u3xHNLU8QCUZc6qoK3wyuVVWs+75yztpZzFE/TYrL9CXi4MjrY38nHFLwvsIXOFTxEnvXbog2T8ECT2Gj1xlOX6Z0vjTV9rLCmw9uq0nYiQ/dSJ4GjaUqtdYPKtdnpz62Qw==',
-            'level' => ['error', 'alert'],
-        ];
         // 校验提交的参数是否合法
-        $data = Pay::alipay($config)->verify();
+        $data = Pay::alipay($this->config)->verify();
         // dd($data);
+        echo '<h1>支付成功！</h1> <hr>';
+        var_dump( $data->all() );
     }
 
     // 服务器端回调
-    public function alipayNotify()
+    public function notify()
     {
-        $config = [
-            'app_id' => '2016091600527335',
-            'ali_public_key' => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqezjjFgYiMrbCWugQqthGzZSk/8JsIJZlLEm6TAfg2CLFQ4Ks3czKaJ7O1Oe6X4X7vVA18KbOKVfI+a0MypWNRcHpqVhbO4jrdawhXQJAgTDgkRZh2UAPZw4aELz1fQxCIto7itY0vQfU94P5tljLX755eFPIbzWfkVHD1pKLlg/Ylrbv0gHXRRuSPDGDznO/hmhsyO+2XqZokqqLDT0lPVDkdHWEGgF+tWRZAza9CEif4/Hs2Gj2z8DO1FF6ieEikC0ywuQDCvSAxUy7cl5AnpzbqzFsSIZgU0+ag+VtfYbV2KQIgJawHziOT9WLJYhSNeHRQBa6jL7e/3VZyyATQIDAQAB',
-            'private_key' => 'MIIEpAIBAAKCAQEAxG42Ea9YCkCMyRCB/ZJE9eE4VjI0iAmPB9JV6h1Za5drR9nrBrkYW/9mQd8LxeUzFyVCapWDUe88x6UUYSPaatcsmr6IW8xzrgcWJWszfRaGr3MzMLsQHnV02zyviqNkIlgsgoRApkLWEPwNRlwXGxyg4HtdQIjHeNL4VvOBBNKitI0cO9GNlGXwO8EkA82HZh2TIP6d9emxIzBHs6wJ6CbgmJ2dkAVGeBl7PXtS4/kcg+6fYm/0Xtbq8LL9jOhvR67QhGkXDRU0WU5gAx3Y+xoLs0eR1XXwtHWl45L1vxWGrNI1m+p5ng6Q2d0SRiKrMBNRM6VlqWFICW8HGROUBwIDAQABAoIBAQCrEJgB2sQ/WWvCBqBOJj3sK9GWL27UMg7f7utnUVv4eQuyrTMizbtLEycIoqhsFWji9U3b6I1Oo5w4+ai/2Ct09CMiOGAkIe90VTOSLsPOYfm1fgvMmnw1KnE0JKtzf0vLJSLOH0L2CCrI69jbt4Nf1xS7qnPRqcydio0/nBx2BzuLarZmnePKJ0P4UmsYgQG8J/JLOuULyLNXmwaIodaunj563/bkdHNiBBg2tC/nTb44AR8iY/RAxJW+hnmMnpWvNGpbumI1RaZPepzyrTmHGreB0x656V7b/doub3KSCtPZjwusxVPftS6muzG4tUQ0YM2ftL97iJQvQfrfb4WhAoGBAOQcTO/HYqN68X1iBkykYcJVswOiZhHAVnCnoMjqgt7nJVtnPbvvAl1Igv8BXEND8oSZ7xCV2LXy1xbozWQkLQ/RRLWt8mNZqFbnKFtJ+eUp7dpuyOqW12dmQM2njmmnM4FVZN3MYeobKHDYJlDo07XASmQ0oHbct5NO4DHJ+ELfAoGBANxyWQzvNNqCCnLxKzijm45kCydo712vAVYsNkn1TfONpWl8adJyzkDBwGekrKBs25uA5jOBZICGR7DsT4a3zxt5RpUXX4WMMASUmetdrFyTpAffsib5r+jLLPMXfYOb9C/u5S2z2FN98Tqx+2XfI3bTAag7jXjgfPX5Y4WGdrvZAoGAFekd/r4hHGDXx1peDoiPl1ISAtxbf4MBCosfZ40XCwAa13/AL0gS6xDm/EWOLivdpJ0AmJA8I6XywRGVgPP0nBtWxTizGpXnFInZl4MwjLGNVjjj9ZyNjjIFMXvRsxZLXTXtnVxfX1RCeyxX6dejVkblHmDrtN8Yhv7BjCbBQPMCgYEAvVGqrpQERR/nD12U69h+MGQ0vAy/fSpdsH7ZxNxZrK/Z/eSuEOEtxqleruPaqQ+z7jFeAZ+/Cy3HBed8SMs0n3igqEvhahTB7D0ejubsrrjQ5z4yhoxqiTdsC/0BevSFWmEFCyHnx5RihjDyIUPn9hUy2CME1Wmdh7U8xiB7eckCgYBmyckGg4B8qnnn9fV66wIsaqypb2tPHnXFBbOEfC4u3xHNLU8QCUZc6qoK3wyuVVWs+75yztpZzFE/TYrL9CXi4MjrY38nHFLwvsIXOFTxEnvXbog2T8ECT2Gj1xlOX6Z0vjTV9rLCmw9uq0nYiQ/dSJ4GjaUqtdYPKtdnpz62Qw==',
-            'level' => ['error', 'alert'],
-        ];
-        $data = Pay::alipay($config)->verify();
+        $data = Pay::alipay($this->config)->verify();
         \Log::debug('Alipay notify', $data->all());
     }
 
