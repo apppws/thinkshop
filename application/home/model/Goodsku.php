@@ -1,5 +1,5 @@
 <?php	
-namespace app\index\model;
+namespace app\home\model;
 use think\Model;
 use app\home\model\GoodAttrKey;
 class Goodsku extends \think\Model
@@ -9,9 +9,9 @@ class Goodsku extends \think\Model
     // 设置当前模型对应的完整数据表名称
     protected $table = 'shop_sku';
 
-    public function getattr(){
-        return $this->hasMany('GoodAttrKey','attr_symbol_path');
-    }
+    // public function getattr(){
+    //     return $this->hasMany('GoodAttrKey','attr_symbol_path');
+    // }
 
 }
 

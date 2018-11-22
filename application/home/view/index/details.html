@@ -458,8 +458,11 @@
                         </div>
 
                         <div class="shop_buy">
-                            <a href="javascript:;" class="shopping_btn " data-position-id="3000017">立即购买</a><a href="javascript:;"
-                                class="buy_btn "><span class="buy_icon icon-shopping"></span><span class="buy_des">加入购物袋</span></a>
+                            <a href="javascript:;" class="shopping_btn " data-position-id="3000017">立即购买</a>
+                            <a href="javascript:;" class="buy_btn ">
+                                <span class="buy_icon icon-shopping"></span>
+                                <span class="buy_des">加入购物袋</span>
+                            </a>
                         </div>
                         <div class="kc">
                             <span>
@@ -820,19 +823,31 @@
             dataType: 'json',
             success: function (data) {
                 // console.log(data);
-                // 判断价钱
-                if (data.price > 0)
-                    $("#price").text(data.price)
-                else
-                    $("#price").text('0.00');
-                stock = data.stock;
-                console.log(stock);
-
-                skuid = data.sku_id;
-                $("#stock").text('(库存量:' + stock + ")");
+                var data = JSON.parse(data);
+                // console.log(data.price);
+                if(data.price>0)
+                        $("#price").text(data.price)
+                    else
+                        $("#price").text('{$sku["price"]}');
+                    stock=data.stock;
+                    skuid=data.id;
+                    $("#stock").text('(库存量:'+stock+")");
+                
             }
         });
 
     });
+    // 加入购物车列表
+    $(".buy_btn").click(function(){
+            var gc = $("#cart-num").val();
+            // console.log(gc);
+            // 如果已经确定skuid
+            // console.log(skuid);
+            if(skuid)
+            {
+                location.href='/home/index/addtocart/id/'+skuid+'/gc/'+gc;
+            }
+        });
+
     
 </script>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/index/css/cart3.css">
+    <link rel="stylesheet" href="/static/index/css/bootstrap.min.css">
+    <title>Document</title>
+    <style>
+
+        #cc{
+            width: 100%;
+            height: 100px;
+            background-color: #cdcdcd71;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cc">
+        <h3>购物车列表</h3>
+    </div>
+    <div class="row" style="text-align:center;">
+        <div class="col-xs-1">
+            <input type="checkbox" checked="checked" class="selall goods_checked"> 全选
+        </div>
+        <div class="col-xs-5">
+            商品
+        </div>
+        <div class="col-xs-1">
+            单价
+        </div>
+        <div class="col-xs-2">
+            数量
+        </div>
+        <div class="col-xs-1">
+            小计
+        </div>
+        <div class="col-xs-1">
+            操作
+        </div>
+    </div>
+    <form action="/home/index/checkout" method="POST">
+        <ul class="cart-body">
+            {foreach $cartData as $v}
+            <li skuid="{$v['sku_id']}">
+                <div class="row">
+                    <div class="col-xs-1">
+                        <input value="{$v['sku_id']}" name="sku_id[]" type="checkbox" checked="checked" class="goods_checked gc">
+                    </div>
+                    <div class="col-xs-4">
+                        <a href="/{$v['goods_id']}.html">
+                            {$v['goodsname']}
+                        </a>
+                    </div>
+                    <div class="col-xs-1">
+                        4G
+                    </div>
+                    <div class="col-xs-1">
+                        ¥<span class="dj">{$v['price']>0? $v['price']:$v['cosprice']}</span>
+                    </div>
+                    <div class="col-xs-2">
+                        <a href="javascript:void(0);" class="btn-num-minus">-</a>
+                        <input stock="{$v['stock']}" type="text" size="5" class="goods_count" value="{$v['goods_count']}">
+                        <a href="javascript:void(0);" class="btn-num-add">+</a>
+                    </div>
+                    <div class="col-xs-1">
+                        ¥<span class="xj">{$v['price']>0? $v['price']:$v['cosprice'] * $v['goods_count']}</span>
+                    </div>
+                    <div class="col-xs-1">
+                        <a class="delete" href="javascript:void(0);">删除</a>
+                    </div>
+                </div>
+            </li>
+            {/foreach}
+
+        </ul>
+        <div class="cart-foot">
+            <div class="row">
+                <div class="col-xs-9">
+                    <input type="checkbox" checked="checked" class="selall goods_checked"> 全选
+                    <a class="delete_sel" href="javascript:void(0);">删除选中的商品</a>
+                </div>
+                <div class="col-xs-3">
+                    总价：<span class="price"></span>
+                    <input type="submit" value="去结算" class="btn btn-danger">
+                </div>
+            </div>
+        </div>
+    </form>
+</body> 
+
+</html>
+<script src="/static/index/js/jquery-3.2.1.min.js"></script>
+<script>
+    // 全选
+    $(".selall").click(function () {
+        $(".goods_checked").prop("checked", $(this).prop("checked"));
+        compute_price();
+    });
+    // 选择商品
+    $(".gc").click(function () {
+        if (!$(this).prop("checked"))
+            $(".selall").prop("checked", false);
+        else {
+            (function () {
+                var c = true;
+                $(".gc").each(function (k, v) {
+                    if (!$(v).prop("checked")) {
+                        c = false;
+                        return false;
+                    }
+                });
+                if (c)
+                    $(".selall").prop("checked", true);
+            })();
+        }
+        compute_price();
+    });
+    // 计算总价
+    function compute_price() {
+        var tp = 0;
+        $(".gc:checked").each(function () {
+            tp += parseFloat($(this).parent().parent().find(".xj").text());
+        });
+        $(".price").text("￥" + tp);
+    }
+    compute_price();
+    // 加号
+    $(".btn-num-add").click(function () {
+        var p = $(this).parent().parent();
+        var gc = parseInt(p.find(".goods_count").val());
+        var stock = p.find(".goods_count").attr("stock");
+        if (gc >= stock) {
+            p.find(".goods_count").val(stock);
+            alert('库存不足！');
+        }
+        else
+            p.find(".goods_count").val(1 + gc);
+        p.find(".xj").text(p.find(".goods_count").val() * p.find(".dj").text());
+        compute_price();
+    });
+    // 减号
+    $(".btn-num-minus").click(function () {
+        var p = $(this).parent().parent();
+        var gc = parseInt(p.find(".goods_count").val());
+        if (gc > 1)
+            p.find(".goods_count").val(gc - 1);
+        p.find(".xj").text(p.find(".goods_count").val() * p.find(".dj").text());
+        compute_price();
+    });
+    // 直接修改
+    $(".goods_count").blur(function () {
+        var p = $(this).parent().parent();
+        var gc = parseInt($(this).val());
+        var stock = $(this).attr("stock");
+        if (gc >= stock) {
+            $(this).val(stock);
+            alert('库存不足！');
+        }
+        if (gc < 1)
+            $(this).val(1);
+        p.find(".xj").text(p.find(".goods_count").val() * p.find(".dj").text());
+        compute_price();
+    });
+    // 删除
+    $(".delete").click(function () {
+        if (confirm('确定要删除吗？')) {
+            $(this).parent().parent().parent().remove();
+            compute_price();
+        }
+    });
+    // 删除所选
+    $(".delete_sel").click(function () {
+        if (confirm('确定要删除吗？')) {
+            $(".gc:checked").each(function () {
+                $(this).parent().parent().parent().remove();
+            });
+            compute_price();
+        }
+    });
+</script>

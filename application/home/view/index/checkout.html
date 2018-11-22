@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/index/css/checkout.css">
+    <script src="/static/index/js/jquery-3.2.1.min.js"></script>
+    <title>结算</title>
+    <style>
+            #pays a{
+                border: 1px solid #DDD;
+                padding: 6px 40px;
+                color: #666;
+                position: relative;
+            }
+            #pays .active{
+                border: 2px solid #e4393c;
+            }
+    
+        </style>
+</head>
+<body>
+        <form action="/home/index/order_pay" method="post" enctype="multipart/form-data">
+        <div class="containerBox clearfix" id="SettlementProcess">
+            <h1>填写核对订单信息</h1>
+            <div id="haigouSplitMsg"></div>
+            <div id="1mallHaigouSplitMsg"></div>
+            <div id="splitMsg"></div>
+            <div data-tpa="RECEIPT_INFO" class="checkInforBox" id="ReceiptInfo">
+                <!--newUser-->
+                <h2>收货信息
+                    <div id="receiverAD" class="adverPositon none"></div>
+                </h2>
+                <!-- {{-- 显示 地址栏 S --}} -->
+                <div class="addressListBox showRow1" id="addressList">
+                    <ul>
+                             <li selffetch="false" addressid="76567122" class="slt">
+                                <p><b name="receiverName">pws</b>收</p>
+                                <p class="listAddressShow">重庆市 </p>
+                                <p class="listAddressShow">重庆市 某某区</p>
+                                <p>18675540424</p>
+                                <div class="operaNav"><span class="editBt">编缉</span><em class="defaultAddressTag">常用地址</em></div>
+                                <sup class="closeSTB"></sup><sub></sub>
+                            </li>
+                    </ul>
+                    <div id="scrollBarMap">
+                        <p> </p>
+                    </div>
+                </div>
+                <!-- {{-- 显示 地址栏 E --}} -->
+    
+                <div id="showAddressOperatBt" style="display: none;"><span class="bLink">展开其他地址<s></s></span></div>
+                <div id="addAddressOperatBt"><span class="Bt Btw2">使用新地址<s></s></span>
+                    <span title="使用支付宝地址" class="usingAlipayAddressCss" id="usingAlipaySpecial" style="display: none;"></span>
+                    <span id="usingSelfPickup" class="Bt Btw2 none" style="display: none;">使用自提服务<s></s></span>
+                    <div id="usingSelfPickup_tip" class="none" style="display: none;">
+                        <i></i>
+                        <ins><s></s>温馨提示：</ins>
+                        <p>1号店现已推出自提服务，您可以选择将所购商品送到自提点，不再担心因外出而错失签收包裹</p>
+                    </div>
+                </div>
+                <!-- 定金预售-->
+                <div style="display:none" id="bookedPreSell"></div>
+            </div>
+            <div data-tpa="DELIVERY_INFO" class="distrInfo checkInforBox" id="deliveryUI">
+                <h2 class="infoTitle">配送信息
+                    <span id="deliveryInfoTip" class="adverPositon" style="display: none;">包裹信息可能已修改，请重新确定配送方式 </span>
+                    <div id="deliveryAD" class="adverPositon none"></div>
+                </h2>
+                <div class="showInfoOrder" id="DeliveryDisplayDiv">
+                    <h3>1号店自营</h3>
+                    <table cellspacing="0" cellpadding="0" border="0" class="showInfoOrder inshop">
+                        <tbody>
+                            <tr>
+                                <th>包裹</th>
+                                <th class="slow_service"> 配送方式 </th>
+                                <th>运费</th>
+                                <th> 备注 </th>
+                            </tr>
+                            <tr>
+                                <td class="DeliveryShowTd">
+                                    <div class="DeliveryShowBox"> 包裹 2 个<i></i></div>
+                                </td>
+    
+                                <td rowspan="1" class="deliverMethod">
+                                    <table cellspacing="0" cellpadding="0" border="0" class="delivMehoedSltBox">
+                                        <tbody>
+                                            <tr>
+                                                <td class="delivMehoedSlt">
+                                                    <!-- {{-- <input type="radio" class="hidden" selected="true" checked="checked" name="1_1_1" value="10001"> -->
+                                                </td>
+                                                <td valign="middle" class="delivMehoedSltTxt">
+                                                    <div style="z-index:19" class="mod_selectDate">
+                                                        <div ordermark="1_1_1" class="timedDelivery_btn_input">
+                                                            <div class="timedDelivery_input clearfix"> <span class="text">
+                                                                    任意日期<em>（普通快递）</em> </span> <i class="icon data_icon"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td rowspan="1" class="freight"> <b> <b>¥10</b> </b>
+                                    <div class="freightInfo">
+                                        <p> </p>
+                                    </div>
+                                </td>
+                                <td rowspan="1" class="remark"> 预计商品下单后明日送达(默认中通、圆通快递) </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="rece_box editeDeliveryBt"><button type="button" class="bt_yrt6 saveOrderDelivery">保存配送信息</button>
+                    <!--<small class="PromptInfo">储蓄卡单笔最高限额¥1000,000,信用卡单笔最高限额¥1000</small>-->
+                </div>
+            </div>
+            <div data-tpa="INVOICE_INFO" class="Invoice checkInforBox" id="invoiceUI">
+                <h2 class="infoTitle">发票信息 <label><a id="invoiceModify" href="javascript:void(0);">[修改]</a></label>
+                </h2>
+                <ul class="showInfoOrder" id="InvoiceDisplayDiv">
+                    <li><b>发票类型：</b>普通发票</li>
+                    <li><b>开票方式：</b>电子发票</li>
+                    <li><b>手机号码：</b>18675540424</li>
+                    <li><b>发票内容：</b> 日用品 <span class="ml20">需要商品清单</span> </li>
+                    <div id="displayNormalInvoiceNotice" class="msgBx"> <ins><s></s>温馨提示：</ins>
+                        <p> 发票金额为现金支付金额（扣除礼品卡金额，抵用券，返利金额等）。</p>
+                        <p class="mt5"> 电子发票是税务局认可的有效付款凭证，支持企业报销，请先确认所属公司是否支持。</p>
+                    </div> <input type="hidden" value="1" id="displayNeedProductDetail">
+                </ul>
+                <div class="invoiceForm clearfix" id="InvoiceEditDiv"></div>
+            </div>
+    
+            <!-- {{-- 支付方式 --}} -->
+            <div data-tpa="PAYMENT_INFO" class="payInfo checkInforBox" id="paymentUI">
+                    <h2 class="infoTitle">支付方式</h2>
+                    <div class="col-xs-12" id="pays">
+                            <a href="javascript:void(0);"  class="pay_method active borderd-a">
+                                <input type="radio" name="pay_method" value="货到付款" checked> 货到付款<b></b>
+                            </a>
+                            <a href="javascript:void(0);"  class="pay_method borderd-a">
+                                <input type="radio" name="pay_method" value="微信"> 微信<b></b>
+                            </a>
+                            <a href="javascript:void(0);"  class="pay_method borderd-a">
+                                <input type="radio" name="pay_method" value="支付宝"> 支付宝<b></b>
+                            </a>
+                    </div>
+            </div>
+            <script>
+                    $(".pay_method").click(function(){
+                    $(".pay_method.active").removeClass('active');
+                    $(this).addClass('active');
+                    $(this).find(":radio").prop("checked",true);
+    
+                    var a = document.querySelector(".btSubOrder1").setAttribute('is_wx','yes');
+    
+    
+                });
+            </script>
+             <!-- {{-- 支付方式 --}} -->
+    
+             <!-- {{-- 商品信息 S --}} -->
+            <div class="none" id="userAuthDiv"></div>
+            <div data-tpa="COMMODITY_INFO" class="commodityInfor checkInforBox">
+                <h2 class="infoTitle">商品信息
+                    <div id="confirmAD" class="adverPositon none"></div>
+                </h2>
+                <div id="confirmUI">
+                    <table cellspacing="0" cellpadding="0" border="0" width="100%" class="showInfoOrder orderProductListInfo">
+                        <tbody>
+                            <tr>
+                                <th width="300" class="txtl">商品名称</th>
+                                <th>数 量(个)</th>
+                                <th>金额小计</th>
+                            </tr>
+                            {foreach $cartData as $v}                        
+                            <tr>
+                                <td class="txtl">{$v['goodsname']}
+                                    <a class="tuihuo tuihuo_no"><em>不支持无理由退货<i></i></em></a>
+                                </td>
+                                <td>{$v['goods_count']}</td>
+                                <td> ¥{$v['price'] * $v['goods_count']}</td>
+                            </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="tuihuo_title">
+                    <span><i class="tuihuo">&nbsp;&nbsp;</i>&nbsp;&nbsp;支持无理由退货（支持天数详见具体商品）</span>
+                    <span><i class="tuihuo_no"></i>不支持无理由退货</span>
+                </p>
+            </div>
+            <!-- {{-- 商品信息 E --}} -->
+    
+            <!-- {{-- 结算 S --}} -->
+            <div data-tpa="STATISTICS_INFO" class="mallsettelment">
+                <div class="payTotal" id="statisticsUI">
+                    <p class="fr">商品金额<label></label>元 + 运费<label>0</label>元 </p>
+                    <p>包裹(个)：1&#12288;&#12288;重量(kg)：0.682 </p> <strong>您需为订单支付<b></b>元</strong>
+                    <div class="userPrivilege clearfix"></div>
+                    <div class="mallsettelment_address"> <a data-tpa="EDIT_ADDRESS_SUBMITORDER"
+                            onclick="returnToEdit();" href="#"> 修改</a></div>
+                </div>
+                <div class="money_tips">
+                    <div class="tips_box">
+                        <label for="BookedPayFix"><input type="checkbox" name="bookedPay" id="BookedPayFix">同意支付<em></em>元定金</label>
+                        <span>(预售商品定金恕不退还，请同意支付定金)</span>
+                    </div>
+                    <p class="tips_txt"></p>
+                </div>
+                <div class="btOrderConfig">
+                    <div class="submitOrderValidCode"></div>
+                    <button data-tpa="SUBMIT_ORDER" class="btSubOrder1" type="submit">提交订单</button>
+                    <input type="hidden" name="skuids" value="{explode(',',$skuids)}">
+                </div>
+            </div>
+            <!-- {{-- 结算 E --}} -->
+        </div>
+    </form>
+</body>
+</html>
